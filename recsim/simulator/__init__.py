@@ -16,4 +16,4 @@
 """Module of the simulator."""
 from recsim.simulator import environment
 from recsim.simulator import recsim_gym
-from recsim.simulator import runner_lib
+#from recsim.simulator import runner_lib

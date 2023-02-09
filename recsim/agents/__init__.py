@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module importing all agents."""
-from recsim.agents import agent_utils
-from recsim.agents import cluster_bandit_agent
-from recsim.agents import full_slate_q_agent
-from recsim.agents import greedy_pctr_agent
+# from recsim.agents import agent_utils
+# from recsim.agents import cluster_bandit_agent
+# from recsim.agents import full_slate_q_agent
+# from recsim.agents import greedy_pctr_agent
 from recsim.agents import random_agent
-from recsim.agents import slate_decomp_q_agent
-from recsim.agents import tabular_q_agent
+#from recsim.agents import slate_decomp_q_agent
+# from recsim.agents import tabular_q_agent

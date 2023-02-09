@@ -26,15 +26,15 @@ from setuptools import setup
 
 here = path.abspath(path.dirname(__file__))
 
-install_requires = [
-    'absl-py',
-    'dopamine-rl >= 2.0.5',
-    'gin-config',
-    'gym',
-    'numpy',
-    'scipy',
-    'tensorflow',
-]
+# install_requires = [
+#     'absl-py',
+#     'dopamine-rl >= 2.0.5',
+#     'gin-config',
+#     'gym',
+#     'numpy',
+#     'scipy',
+#     'tensorflow',
+# ]
 
 recsim_description = (
     'RecSim: A Configurable Recommender Systems Simulation Platform')
@@ -51,32 +51,32 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/google-research/recsim',
-    packages=find_packages(exclude=['docs']),
-    classifiers=[  # Optional
-        'Development Status :: 3 - Alpha',
+    #ackages=find_packages(exclude=['docs']),
+    # classifiers=[  # Optional
+    #     'Development Status :: 3 - Alpha',
 
-        # Indicate who your project is intended for
-        'Intended Audience :: Developers',
-        'Intended Audience :: Education',
-        'Intended Audience :: Science/Research',
+    #     # Indicate who your project is intended for
+    #     'Intended Audience :: Developers',
+    #     'Intended Audience :: Education',
+    #     'Intended Audience :: Science/Research',
 
-        # Pick your license as you wish
-        'License :: OSI Approved :: Apache Software License',
+    #     # Pick your license as you wish
+    #     'License :: OSI Approved :: Apache Software License',
 
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
+    #     # Specify the Python versions you support here. In particular, ensure
+    #     # that you indicate whether you support Python 2, Python 3 or both.
+    #     'Programming Language :: Python :: 2',
+    #     'Programming Language :: Python :: 3',
 
-        'Topic :: Scientific/Engineering',
-        'Topic :: Scientific/Engineering :: Mathematics',
-        'Topic :: Scientific/Engineering :: Artificial Intelligence',
-        'Topic :: Software Development',
-        'Topic :: Software Development :: Libraries',
-        'Topic :: Software Development :: Libraries :: Python Modules',
+    #     'Topic :: Scientific/Engineering',
+    #     'Topic :: Scientific/Engineering :: Mathematics',
+    #     'Topic :: Scientific/Engineering :: Artificial Intelligence',
+    #     'Topic :: Software Development',
+    #     'Topic :: Software Development :: Libraries',
+    #     'Topic :: Software Development :: Libraries :: Python Modules',
 
-    ],
-    install_requires=install_requires,
+    # ],
+    #install_requires=install_requires,
     project_urls={  # Optional
         'Documentation': 'https://github.com/google-research/recsim',
         'Bug Reports': 'https://github.com/google-research/recsim/issues',

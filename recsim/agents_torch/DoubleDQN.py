@@ -12,7 +12,7 @@ replay_memory_size=10000
 gamma=0.9
 target_update_iter=100
 log_internval=100
-train_episodes = 5000
+train_episodes=5000
 terminal_step = 300
 
 env=gym.make('CartPole-v0')
@@ -20,10 +20,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 env=env.unwrapped
 n_action=env.action_space.n
 n_state=env.observation_space.shape[0]
-hidden=32
+hidden=256
 
 res_dir = 'results'
-
 if not os.path.exists(res_dir):
     os.makedirs(res_dir)
 
@@ -34,7 +33,6 @@ class net(torch.nn.Module):
         self.fc1.weight.data.normal_(0, 0.1)
         self.out=torch.nn.Linear(hidden,n_action)
         self.out.weight.data.normal_(0, 0.1)
-
 
     def forward(self,x):
         x=self.fc1(x)
@@ -52,7 +50,7 @@ class replay_memory():
         return self.memory.shape[0]
 
     def store_transition(self,trans):
-        # trans : [s,a,r,s',done]
+
         if(self.memory.shape[0]<self.memory_size):
             if self.new==0:
                 self.memory=np.array(trans)
@@ -70,8 +68,7 @@ class replay_memory():
         sam=np.random.choice(self.memory.shape[0],batch_size)
         return self.memory[sam]
 
-class DQN():
-
+class DQN(object):
     def __init__(self):
         self.eval_q_net,self.target_q_net=net().to(device),net().to(device)
         self.replay_mem=replay_memory()
@@ -101,11 +98,15 @@ class DQN():
         b_d=torch.FloatTensor(batch[:,4].tolist()).to(device)
         q_target=torch.zeros((batch_size,1)).to(device)
         q_eval=self.eval_q_net(b_s)
+        q=q_eval
         q_eval=torch.gather(q_eval,dim=1,index=torch.unsqueeze(b_a,1))
         q_next=self.target_q_net(b_s_).detach()
         for i in range(b_d.shape[0]):
             if(int(b_d[i].tolist()[0])==0):
-                q_target[i]=b_r[i]+gamma*torch.unsqueeze(torch.max(q_next[i],0)[0],0)
+                # decouple action selection and action evaluation
+                action=torch.argmax(q[i],0).detach()
+                #q_target[i]=b_r[i]+gamma*torch.unsqueeze(torch.max(q_next[i],0)[0],0) for DQN
+                q_target[i]=b_r[i]+gamma*q_next[i,action]
             else:
                 q_target[i]=b_r[i]
         td_error=self.loss(q_eval,q_target)
@@ -119,7 +120,7 @@ dqn=DQN()
 all_rewards = []
 all_losses = []
 
-for episode in range(train_episodes):
+for episode in range(10000):
     state = env.reset()
     reward = 0.0
     train_step = 0
@@ -160,19 +161,18 @@ for episode in range(train_episodes):
                     break
                 eval_state=eval_next_state
             total_reward+=eps_reward
-
         print("Episode:"+format(episode)+", eval reward:"+format(total_reward/10))
         all_rewards.append(total_reward)
 
 print('Complete')
 plt.plot(all_rewards)
 plt.ylabel('Rewards')
-file_name = res_dir + '/DQN_cartpole_rewards.png'
+file_name = res_dir + '/DoubleDQN_cartpole_rewards.png'
 plt.savefig(file_name)
 
 plt.clf()
 
 plt.plot(all_losses)
 plt.ylabel('TD_Error')
-file_name = res_dir + '/DQN_cartpole_losses.png'
+file_name = res_dir + '/DoubleDQN_cartpole_losses.png'
 plt.savefig(file_name)

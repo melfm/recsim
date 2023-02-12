@@ -1,4 +1,5 @@
 
+import torch
 import math
 import random
 import numpy as np
@@ -10,7 +11,7 @@ from recsim.environments import interest_evolution
 from recsim.environments import long_term_satisfaction
 from gym import spaces
 
-import torch
+
 import torch.nn as nn
 import torch.optim as optim
 
@@ -66,9 +67,9 @@ def mlp(input_dim, hidden_dim, output_dim, hidden_depth, output_mod=None):
     trunk = nn.Sequential(*mods)
     return trunk
 
-env_config = {'slate_size': 2,
+env_config = {'slate_size': 1,
               'seed': 0,
-              'num_candidates': 15,
+              'num_candidates': 5,
               'resample_documents': True}
 
 env = interest_evolution.create_environment(env_config)
@@ -97,12 +98,11 @@ EPS_END = 0.05
 EPS_DECAY = 200
 TARGET_UPDATE = 10
 
-hidden_dim = 64
+hidden_dim = 32
 obs_dim = obs_shape + doc_space_shape * num_candidates + 5
-hidden_depth = 2
+hidden_depth = 3
 output_dim = env.action_space.nvec[0]
 
-# TODO : Maybe add the action backinto obs
 policy_net = MLP(obs_dim, hidden_dim, output_dim, hidden_depth)
 target_net = MLP(obs_dim, hidden_dim, output_dim, hidden_depth)
 
@@ -193,12 +193,12 @@ def optimize_model(i_episode):
     for param in policy_net.parameters():
         param.grad.data.clamp_(-1, 1)
     optimizer.step()
-    if i_episode % 500 == 0:
+    if i_episode % 2000 == 0:
         print('Episode ', i_episode, 'Loss', loss.item())
         all_losses.append(loss.item())
 
 
-num_episodes = 10
+num_episodes = 5000
 episode_durations = []
 all_rewards = []
 eps_reward = 0.0
@@ -218,8 +218,6 @@ for i_episode in range(num_episodes):
 
         eps_reward += reward.item()
     
-        #last_screen = current_screen
-        #current_screen = get_screen()
         if done:
             obs_next = None
             if i_episode % 10 == 0:
@@ -236,7 +234,7 @@ for i_episode in range(num_episodes):
         if done:
             episode_durations.append(t + 1)
             #print('Episode duration ', t)
-            all_rewards.append(eps_reward/t)
+            all_rewards.append(eps_reward)
             eps_reward = 0.0
             break
     # Update the target network, copying all weights and biases in DQN
@@ -246,15 +244,15 @@ for i_episode in range(num_episodes):
 print('Complete')
 plt.plot(all_rewards)
 plt.ylabel('Rewards')
-file_name = res_dir + '/rewards_slate.png'
+file_name = res_dir + '/DQN_rewards_slate.png'
 plt.savefig(file_name)
 plt.clf()
 plt.plot(all_losses)
 plt.ylabel('Losses')
-file_name = res_dir + '/losses_slate.png'
+file_name = res_dir + '/DQN_losses_slate.png'
 plt.savefig(file_name)
 plt.clf()
 plt.plot(episode_durations)
 plt.ylabel('Episode Durations')
-file_name = res_dir + '/eps_duration.png'
+file_name = res_dir + '/DQN_eps_duration.png'
 plt.savefig(file_name)

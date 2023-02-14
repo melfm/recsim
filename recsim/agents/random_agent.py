@@ -31,6 +31,7 @@ class RandomAgent(agent.AbstractEpisodicRecommenderAgent):
 
   def __init__(self, action_space, random_seed=0):
     super(RandomAgent, self).__init__(action_space)
+    self.slate_size = action_space.nvec[0]
     self._rng = np.random.RandomState(random_seed)
 
   def step(self, reward, observation):
@@ -54,6 +55,6 @@ class RandomAgent(agent.AbstractEpisodicRecommenderAgent):
     # Simulate a random slate
     doc_ids = list(range(len(doc_obs)))
     self._rng.shuffle(doc_ids)
-    slate = doc_ids[:self._slate_size]
+    slate = doc_ids[:self.slate_size]
     logging.debug('Recommended slate: %s', slate)
     return slate

@@ -23,13 +23,13 @@ import os
 import time
 
 from absl import flags
-from dopamine.discrete_domains import checkpointer
+from agents.dopamine.agents import checkpointer
 import gin.tf
 from gym import spaces
 import numpy as np
 from recsim.simulator import environment
 import tensorflow.compat.v1 as tf
-
+tf.disable_eager_execution()
 
 flags.DEFINE_bool(
     'debug_mode', False,
@@ -278,6 +278,7 @@ class Runner(object):
       step_number += 1
 
       if done:
+        print('Reward ', total_reward)
         break
       elif step_number == self._max_steps_per_episode:
         # Stop the run loop once we reach the true end of episode.
@@ -330,6 +331,9 @@ class Runner(object):
     add_summary('AverageEpisodeLength', np.mean(self._stats['episode_length']))
     add_summary('AverageEpisodeRewards', np.mean(self._stats['episode_reward']))
     add_summary('StdEpisodeRewards', np.std(self._stats['episode_reward']))
+
+    print('AverageEpisodeLength', np.mean(self._stats['episode_length']))
+    print('AverageEpisodeRewards', np.mean(self._stats['episode_reward']))
 
     # Environment-specific Tensorboard summaries.
     self._env.write_metrics(add_summary)
@@ -483,3 +487,8 @@ class EvalRunner(Runner):
     tf.logging.info('eval_file: %s', output_file)
     with tf.io.gfile.GFile(output_file, 'w+') as f:
       f.write(str(episode_rewards))
+
+    with open("test.txt", "a") as myfile:
+        myfile.write(str(episode_rewards))
+
+    print('Eval rewards average ', np.mean(episode_rewards))

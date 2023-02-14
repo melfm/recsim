@@ -20,8 +20,8 @@ from __future__ import print_function
 
 import collections
 
-from dopamine.agents.dqn import dqn_agent
-from dopamine.replay_memory import circular_replay_buffer
+from agents.dopamine.agents import dqn_agent
+from agents.dopamine.agents import circular_replay_buffer
 import gin.tf
 from gym import spaces
 import numpy as np

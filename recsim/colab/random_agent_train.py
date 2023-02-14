@@ -14,7 +14,7 @@ from gym import spaces
 
 env_config = {'slate_size': 1,
               'seed': 0,
-              'num_candidates': 5,
+              'num_candidates': 10,
               'resample_documents': True}
 
 env = interest_evolution.create_environment(env_config)
@@ -39,7 +39,8 @@ env.reset()
 hidden_dim = 64
 obs_dim = obs_shape + doc_space_shape * num_candidates + 5
 hidden_depth = 2
-output_dim = env.action_space.nvec[0]
+action_space = env.action_space.nvec.shape[0]
+
 
 steps_done = 0
 res_dir = 'results'
@@ -51,7 +52,7 @@ num_episodes = 500
 episode_durations = []
 all_rewards = []
 eps_reward = 0.0
-action_space = spaces.MultiDiscrete(output_dim * np.ones((1,)))
+action_space = spaces.MultiDiscrete(action_space * np.ones((1,)))
 agent = random_agent.RandomAgent(action_space, random_seed=0)
 
 for i_episode in range(num_episodes):
@@ -61,6 +62,8 @@ for i_episode in range(num_episodes):
         # Select and perform an action
         action = agent.step(1, observation=obs)
         _, reward, done, _ = env.step(action)
+        # print('Action ', action)
+
         reward = torch.tensor([reward], device=device)
         eps_reward += reward.item()
 
@@ -83,3 +86,5 @@ plt.plot(episode_durations)
 plt.ylabel('Episode Durations')
 file_name = res_dir + '/rand_policy_eps_duration.png'
 plt.savefig(file_name)
+
+print('Reward average ', np.mean(all_rewards))

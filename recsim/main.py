@@ -31,6 +31,7 @@ from absl import app
 from absl import flags
 import numpy as np
 from recsim.agents import full_slate_q_agent
+from recsim.agents import slate_decomp_q_agent
 from recsim.environments import interest_evolution
 from recsim.simulator import runner_lib
 
@@ -57,7 +58,8 @@ def create_agent(sess, environment, eval_mode, summary_writer=None):
       'summary_writer': summary_writer,
       'eval_mode': eval_mode,
   }
-  return full_slate_q_agent.FullSlateQAgent(sess, **kwargs)
+  # return full_slate_q_agent.FullSlateQAgent(sess, **kwargs)
+  return slate_decomp_q_agent.SlateDecompQAgent(sess, **kwargs)
 
 
 def main(argv):
@@ -77,16 +79,16 @@ def main(argv):
 
   runner = runner_lib.TrainRunner(
       base_dir=FLAGS.base_dir,
-      create_agent_fn=create_agent,
+      create_agent_fn=slate_decomp_q_agent.create_agent,
       env=interest_evolution.create_environment(env_config),
       episode_log_file=FLAGS.episode_log_file,
       max_training_steps=50,
-      num_iterations=10)
+      num_iterations=1000)
   runner.run_experiment()
 
   runner = runner_lib.EvalRunner(
       base_dir=FLAGS.base_dir,
-      create_agent_fn=create_agent,
+      create_agent_fn=slate_decomp_q_agent.create_agent,
       env=interest_evolution.create_environment(env_config),
       max_eval_episodes=5,
       test_mode=True)

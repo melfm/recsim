@@ -20,6 +20,8 @@ from recsim import choice_model
 from recsim.agents.dopamine import dqn_agent
 import tensorflow.compat.v1 as tf
 
+tf.disable_eager_execution()
+
 
 def compute_probs_tf(slate, scores_tf, score_no_click_tf):
   """Computes the selection probability and returns selected index.
@@ -727,71 +729,79 @@ class SlateDecompQAgent(dqn_agent.DQNAgentRecSim,
         self._response_adapter.encode(observation['response']))
 
 
-def create_agent(agent_name, sess, **kwargs):
+def create_agent(sess, agent_name, **kwargs):
   """Creates a slate decomposition agent given agent name."""
-  if agent_name == 'dp_random':
-    return SlateDecompQAgent(
-        sess,
-        epsilon_train=1.0,
-        epsilon_eval=1.0,
-        select_slate_fn=select_slate_greedy,
-        compute_target_fn=compute_target_sarsa,
-        **kwargs)
-  elif agent_name == 'slate_topk_sarsa':
-    return SlateDecompQAgent(
-        sess,
-        select_slate_fn=select_slate_topk,
-        compute_target_fn=compute_target_sarsa,
-        **kwargs)
-  elif agent_name == 'myopic_slate_topk_sarsa':
-    return SlateDecompQAgent(
-        sess,
-        gamma=0,
-        select_slate_fn=select_slate_topk,
-        compute_target_fn=compute_target_sarsa,
-        **kwargs)
-  elif agent_name == 'slate_greedy_sarsa':
-    return SlateDecompQAgent(
-        sess,
-        select_slate_fn=select_slate_greedy,
-        compute_target_fn=compute_target_sarsa,
-        **kwargs)
-  elif agent_name == 'myopic_slate_greedy_sarsa':
-    return SlateDecompQAgent(
-        sess,
-        gamma=0,
-        select_slate_fn=select_slate_greedy,
-        compute_target_fn=compute_target_sarsa,
-        **kwargs)
-  elif agent_name == 'slate_greedy_optimal_q':
-    return SlateDecompQAgent(
-        sess,
-        select_slate_fn=select_slate_greedy,
-        compute_target_fn=compute_target_optimal_q,
-        **kwargs)
-  elif agent_name == 'slate_topk_topk_q':
-    return SlateDecompQAgent(
-        sess,
-        select_slate_fn=select_slate_topk,
-        compute_target_fn=compute_target_topk_q,
-        **kwargs)
-  elif agent_name == 'slate_topk_optimal_q':
-    return SlateDecompQAgent(
-        sess,
-        select_slate_fn=select_slate_topk,
-        compute_target_fn=compute_target_optimal_q,
-        **kwargs)
-  elif agent_name == 'slate_optimal_optimal_q':
-    return SlateDecompQAgent(
-        sess,
-        select_slate_fn=select_slate_optimal,
-        compute_target_fn=compute_target_optimal_q,
-        **kwargs)
-  elif agent_name == 'slate_greedy_greedy_q':
-    return SlateDecompQAgent(
-        sess,
-        select_slate_fn=select_slate_greedy,
-        compute_target_fn=compute_target_greedy_q,
-        **kwargs)
-  else:
-    raise ValueError('Unknown agent: {}'.format(agent_name))
+  return SlateDecompQAgent(
+    sess,
+    observation_space=agent_name.observation_space,
+    action_space=agent_name.action_space,
+    select_slate_fn=select_slate_topk,
+    compute_target_fn=compute_target_sarsa,
+    **kwargs)
+
+  # if agent_name == 'dp_random':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       epsilon_train=1.0,
+  #       epsilon_eval=1.0,
+  #       select_slate_fn=select_slate_greedy,
+  #       compute_target_fn=compute_target_sarsa,
+  #       **kwargs)
+  # elif agent_name == 'slate_topk_sarsa':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       select_slate_fn=select_slate_topk,
+  #       compute_target_fn=compute_target_sarsa,
+  #       **kwargs)
+  # elif agent_name == 'myopic_slate_topk_sarsa':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       gamma=0,
+  #       select_slate_fn=select_slate_topk,
+  #       compute_target_fn=compute_target_sarsa,
+  #       **kwargs)
+  # elif agent_name == 'slate_greedy_sarsa':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       select_slate_fn=select_slate_greedy,
+  #       compute_target_fn=compute_target_sarsa,
+  #       **kwargs)
+  # elif agent_name == 'myopic_slate_greedy_sarsa':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       gamma=0,
+  #       select_slate_fn=select_slate_greedy,
+  #       compute_target_fn=compute_target_sarsa,
+  #       **kwargs)
+  # elif agent_name == 'slate_greedy_optimal_q':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       select_slate_fn=select_slate_greedy,
+  #       compute_target_fn=compute_target_optimal_q,
+  #       **kwargs)
+  # elif agent_name == 'slate_topk_topk_q':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       select_slate_fn=select_slate_topk,
+  #       compute_target_fn=compute_target_topk_q,
+  #       **kwargs)
+  # elif agent_name == 'slate_topk_optimal_q':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       select_slate_fn=select_slate_topk,
+  #       compute_target_fn=compute_target_optimal_q,
+  #       **kwargs)
+  # elif agent_name == 'slate_optimal_optimal_q':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       select_slate_fn=select_slate_optimal,
+  #       compute_target_fn=compute_target_optimal_q,
+  #       **kwargs)
+  # elif agent_name == 'slate_greedy_greedy_q':
+  #   return SlateDecompQAgent(
+  #       sess,
+  #       select_slate_fn=select_slate_greedy,
+  #       compute_target_fn=compute_target_greedy_q,
+  #       **kwargs)
+  # else:
+  #   raise ValueError('Unknown agent: {}'.format(agent_name))

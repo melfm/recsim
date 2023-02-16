@@ -59,7 +59,7 @@ def create_agent(sess, environment, eval_mode, summary_writer=None):
       'eval_mode': eval_mode,
   }
   # return full_slate_q_agent.FullSlateQAgent(sess, **kwargs)
-  return slate_decomp_q_agent.SlateDecompQAgent(sess, **kwargs)
+  return slate_decomp_q_agent.create_agent(agent_name='slate_topk_sarsa', sess=sess, **kwargs)
 
 
 def main(argv):
@@ -68,10 +68,10 @@ def main(argv):
 
   runner_lib.load_gin_configs(FLAGS.gin_files, FLAGS.gin_bindings)
   seed = 0
-  slate_size = 2
+  slate_size = 3
   np.random.seed(seed)
   env_config = {
-      'num_candidates': 5,
+      'num_candidates': 10,
       'slate_size': slate_size,
       'resample_documents': True,
       'seed': seed,
@@ -79,16 +79,16 @@ def main(argv):
 
   runner = runner_lib.TrainRunner(
       base_dir=FLAGS.base_dir,
-      create_agent_fn=slate_decomp_q_agent.create_agent,
+      create_agent_fn=create_agent,
       env=interest_evolution.create_environment(env_config),
       episode_log_file=FLAGS.episode_log_file,
-      max_training_steps=50,
-      num_iterations=1000)
+      max_training_steps=100,
+      num_iterations=5000)
   runner.run_experiment()
 
   runner = runner_lib.EvalRunner(
       base_dir=FLAGS.base_dir,
-      create_agent_fn=slate_decomp_q_agent.create_agent,
+      create_agent_fn=create_agent,
       env=interest_evolution.create_environment(env_config),
       max_eval_episodes=5,
       test_mode=True)
